@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Todo List{% endblock %}
+
+{% block content %}
+
+<!-- Add Task Form -->
+<section class="add-form card">
+  <h2>Add New Task</h2>
+  <form action="/add" method="POST" class="form">
+    <div class="form-row">
+      <input
+        type="text"
+        name="title"
+        placeholder="What needs to be done?"
+        class="input-title"
+        required
+        autofocus
+      />
+      <select name="priority" class="select-priority">
+        <option value="low">🟢 Low</option>
+        <option value="medium" selected>🟡 Medium</option>
+        <option value="high">🔴 High</option>
+      </select>
+      <button type="submit" class="btn btn-primary">Add Task</button>
+    </div>
+    <textarea
+      name="description"
+      placeholder="Optional description..."
+      class="input-description"
+      rows="2"
+    ></textarea>
+  </form>
+</section>
+
+<!-- Stats -->
+<section class="stats">
+  <span>Total: <strong>{{ total }}</strong></span>
+  <span>Active: <strong>{{ active_count }}</strong></span>
+  <span>Completed: <strong>{{ completed_count }}</strong></span>
+</section>
+
+<!-- Filter Tabs -->
+<nav class="filter-tabs">
+  <a href="/?filter=all" class="tab {% if filter_by == 'all' %}active{% endif %}">All</a>
+  <a href="/?filter=active" class="tab {% if filter_by == 'active' %}active{% endif %}">Active</a>
+  <a href="/?filter=completed" class="tab {% if filter_by == 'completed' %}active{% endif %}">Completed</a>
+
+  {% if completed_count > 0 %}
+  <form action="/clear-completed" method="POST" style="margin-left: auto;">
+    <button type="submit" class="btn btn-danger btn-sm">Clear Completed</button>
+  </form>
+  {% endif %}
+</nav>
+
+<!-- Todo List -->
+<section class="todo-list">
+  {% if todos %}
+    {% for todo in todos %}
+    <div class="todo-item {% if todo.completed %}completed{% endif %} priority-{{ todo.priority }}">
+
+      <div class="todo-left">
+        <form action="/toggle/{{ todo.id }}?filter={{ filter_by }}" method="POST" class="toggle-form">
+          <button type="submit" class="toggle-btn" title="Toggle complete">
+            {% if todo.completed %}{% else %}{% endif %}
+          </button>
+        </form>
+
+        <div class="todo-content">
+          <span class="todo-title">{{ todo.title }}</span>
+          {% if todo.description %}
+            <span class="todo-desc">{{ todo.description }}</span>
+          {% endif %}
+          <span class="todo-meta">
+            <span class="badge badge-{{ todo.priority }}">{{ todo.priority }}</span>
+            <span class="todo-date">{{ todo.created_at.strftime('%b %d, %Y') }}</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="todo-actions">
+        <a href="/edit/{{ todo.id }}" class="btn btn-secondary btn-sm">Edit</a>
+        <form action="/delete/{{ todo.id }}?filter={{ filter_by }}" method="POST" class="inline-form">
+          <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this task?')">Delete</button>
+        </form>
+      </div>
+
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty-state">
+      <p>🎉 No tasks here. {% if filter_by == 'all' %}Add one above!{% elif filter_by == 'active' %}All caught up!{% else %}No completed tasks yet.{% endif %}</p>
+    </div>
+  {% endif %}
+</section>
+
+{% endblock %}

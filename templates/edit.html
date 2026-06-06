@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Task{% endblock %}
+
+{% block content %}
+<section class="card edit-card">
+  <h2>Edit Task</h2>
+  <form action="/edit/{{ todo.id }}" method="POST" class="form">
+
+    <div class="form-group">
+      <label for="title">Title</label>
+      <input
+        type="text"
+        id="title"
+        name="title"
+        value="{{ todo.title }}"
+        class="input-title"
+        required
+        autofocus
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea
+        id="description"
+        name="description"
+        class="input-description"
+        rows="3"
+      >{{ todo.description or '' }}</textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="priority">Priority</label>
+      <select id="priority" name="priority" class="select-priority">
+        <option value="low" {% if todo.priority == 'low' %}selected{% endif %}>🟢 Low</option>
+        <option value="medium" {% if todo.priority == 'medium' %}selected{% endif %}>🟡 Medium</option>
+        <option value="high" {% if todo.priority == 'high' %}selected{% endif %}>🔴 High</option>
+      </select>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Save Changes</button>
+      <a href="/" class="btn btn-secondary">Cancel</a>
+    </div>
+
+  </form>
+</section>
+{% endblock %}
